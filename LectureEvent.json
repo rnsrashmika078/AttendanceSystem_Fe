@@ -1,0 +1,7 @@
+[
+    { "id" : 1,"lecturer": "MA Suhail Razith", "lecture": "CIS20202", "lecture_hall": "LH5" },
+    { "id" : 2,  "lecturer": "JS Musfira","lecture": "SWT20202", "lecture_hall": "LH3" },
+    { "id" : 3,  "lecturer": "CG Kariappa","lecture": "NST3012", "lecture_hall": "MC5" },
+    { "id" : 4, "lecturer": "AB Ahamed Sabani", "lecture": "UCT12120", "lecture_hall": "MC2" }
+
+]
