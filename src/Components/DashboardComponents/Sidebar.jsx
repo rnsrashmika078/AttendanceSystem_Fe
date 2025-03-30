@@ -18,7 +18,7 @@ function Sidebar() {
         
      <div className={`transition-transform ${isOpen ? '-translate-x-7': '-translate-x-0'}`}>
         <button
-          className="absolute left-55 top-0  text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+          className="z-50 absolute left-55 top-0  text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
           type="button"
           onClick={()=>setIsOpen(!isOpen)}
           data-drawer-target="drawer-navigation"

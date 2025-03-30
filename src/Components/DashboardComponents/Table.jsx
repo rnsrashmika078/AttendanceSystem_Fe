@@ -2,79 +2,35 @@ import React from "react";
 
 export default function Table() {
   return (
-    <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-      <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead className="text-xs text-gray-700 uppercase dark:text-gray-400">
-          <tr>
-            <th scope="col" className="px-6 py-3 bg-gray-50 dark:bg-gray-800">
-              Time
+    <div className="relative overflow-x-auto shadow-md ">
+      <table className="w-full text-sm text-center ">
+        <thead className="text-xs dark:border-gray-700">
+          <tr className="border  text-gray-900">
+            <th scope="col" className="px-6 py-3 border-1 ">
+              No
             </th>
-            <th scope="col" className="px-6 py-3">
-              Color
+            <th scope="col" className="px-6 py-3 border-1 ">
+              Registration Number
             </th>
-            <th scope="col" className="px-6 py-3 bg-gray-50 dark:bg-gray-800">
-              Category
+            <th scope="col" className="px-6 py-3 border-1 ">
+              Student Name
             </th>
-            <th scope="col" className="px-6 py-3">
-              Price
+            <th scope="col" className="px-6 py-3 border-1 ">
+              Attendance
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr className="border-b border-gray-200 dark:border-gray-700">
+          <tr className="border  text-gray-900">
             <th
               scope="row"
-              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800"
+              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-1   "
             >
-              Apple MacBook Pro 17"
+              1
             </th>
-            <td className="px-6 py-4">Silver</td>
-            <td className="px-6 py-4 bg-gray-50 dark:bg-gray-800">Laptop</td>
-            <td className="px-6 py-4">$2999</td>
-          </tr>
-          <tr className="border-b border-gray-200 dark:border-gray-700">
-            <th
-              scope="row"
-              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800"
-            >
-              Microsoft Surface Pro
-            </th>
-            <td className="px-6 py-4">White</td>
-            <td className="px-6 py-4 bg-gray-50 dark:bg-gray-800">Laptop PC</td>
-            <td className="px-6 py-4">$1999</td>
-          </tr>
-          <tr className="border-b border-gray-200 dark:border-gray-700">
-            <th
-              scope="row"
-              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800"
-            >
-              Magic Mouse 2
-            </th>
-            <td className="px-6 py-4">Black</td>
-            <td className="px-6 py-4 bg-gray-50 dark:bg-gray-800">Accessories</td>
-            <td className="px-6 py-4">$99</td>
-          </tr>
-          <tr className="border-b border-gray-200 dark:border-gray-700">
-            <th
-              scope="row"
-              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800"
-            >
-              Google Pixel Phone
-            </th>
-            <td className="px-6 py-4">Gray</td>
-            <td className="px-6 py-4 bg-gray-50 dark:bg-gray-800">Phone</td>
-            <td className="px-6 py-4">$799</td>
-          </tr>
-          <tr>
-            <th
-              scope="row"
-              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800"
-            >
-              Apple Watch 5
-            </th>
-            <td className="px-6 py-4">Red</td>
-            <td className="px-6 py-4 bg-gray-50 dark:bg-gray-800">Wearables</td>
-            <td className="px-6 py-4">$999</td>
+            <td className="px-6 py-4 border-1 ">SEU/IS/20/ICT/076</td>
+            <td className="px-6 py-4 border-1  ">M.W.R.N.Siriwardhana</td>
+            <td className="px-6 py-4 border-1 ">{}</td>
           </tr>
         </tbody>
       </table>

@@ -1,0 +1,56 @@
+/* qrStyle.css */
+#reader {
+    width: 100%;
+    max-width: 300px;
+    margin: auto;
+    padding: 10px;
+    border: 2px solid #4f46e5;
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  #reader .qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  #reader .success-message {
+    font-size: 18px;
+    font-weight: bold;
+    color: #10b981;
+  }
+  
+  #reader h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #374151;
+  }
+  
+  #reader  .bg-gray-200 {
+    background-color: #f3f4f6;
+  }
+  
+  #reader .shadow-1xl {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+ #reader img{
+    align-items: center;
+    margin: auto;
+    width: 50%;
+    justify-content: center;
+  }
+  #reader button{
+    display: flex;
+    flex-direction: column;
+    background-color: blue;
+    border-radius: 10rem;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    padding: 5px;
+    margin: auto;
+  }

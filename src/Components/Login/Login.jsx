@@ -1,98 +1,231 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import InputField from "../Common/InputField";
+import DropDown from "../Common/DropDown";
+import { useContext, useEffect, useState } from "react";
+import ErrorComponent from "../Notification/ErrorComponent";
+import Add from "../Notification/Add";
+import { AuthContext } from "../AppContext/AuthContext";
+import CryptoJS from "crypto-js";
 
 const Login = () => {
+  const { token, setToken, setUser } = useContext(AuthContext);
+  const [error, setError] = useState("");
+  const [onSuccess, setOnSuccess] = useState(false);
+  const navigate = useNavigate();
+  const [errorMsgTitle, setErrorMsgTitle] = useState("");
+  const [loginDetails, setLoginDetails] = useState({
+    email: "",
+    password: "",
+    account_type: "",
+  });
+
+  // Encryption Alogirth -> AES
+  const encrypt = (secretKey, data) => {
+    const encryptionToken = CryptoJS.AES.encrypt(
+      data.token,
+      secretKey
+    ).toString();
+
+    const encryptionUser = CryptoJS.AES.encrypt(
+      JSON.stringify(data.user),
+      secretKey
+    ).toString();
+    localStorage.setItem("token", encryptionToken);
+    localStorage.setItem("user", encryptionUser);
+  };
+
+  const handleOnChange = (e) => {
+    setError("");
+    setErrorMsgTitle("");
+    const { name, value } = e.target;
+    setLoginDetails({ ...loginDetails, [name]: value });
+  };
+
+  const setNotifierVisibility = (stat) => {
+    if (!stat) {
+      setOnSuccess(false);
+    }
+  };
+  useEffect(() => {
+    if (token) {
+      navigate("/dashboard");
+    }
+  }, [navigate, token]);
+
+  useEffect(() => {
+    if (token) {
+      alert(token)
+    }
+  }, [token]);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    setErrorMsgTitle("");
+
+    if (!loginDetails.email) {
+      setError("Email field is Required!");
+      return;
+    }
+    if (!loginDetails.password) {
+      setError("Password field is Required!");
+      return;
+    }
+    if (!loginDetails.account_type) {
+      setError("Please Select the Account Type!");
+      return;
+    }
+    await fetch(
+      `http://localhost:8000/api/${
+        loginDetails?.account_type === "Student"
+          ? "student_login"
+          : "lecturer_login"
+      }`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginDetails),
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status) {
+          setOnSuccess(true);
+          // localStorage.setItem("token", data.token);
+          // localStorage.setItem("user", JSON.stringify(data.user));
+          encrypt("abc", data);
+          setToken(data.token);
+          setUser(data.user);
+
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 2000);
+          setTimeout(() => {
+            setOnSuccess(false);
+          }, 2000);
+        } else {
+          setError(String(data.message));
+          setErrorMsgTitle("User Exist");
+          setOnSuccess(false);
+          return;
+        }
+      })
+      .catch((error) => {
+        alert("Error: " + error.message);
+      });
+  };
+  const success = () => {
+    return (
+      <div>
+        <Add
+          messageBody={"Successfully Logged In!"}
+          setNotifierVisibility={setNotifierVisibility}
+        />
+      </div>
+    );
+  };
+  useEffect(() => {
+    console.log(loginDetails);
+  }, [loginDetails]);
   return (
     <>
-     <div className="mt-10 w-auto mx-2 ">
-      <div className="space-y-0 ">
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
-            alt="Your Company"
-            src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-            className="mx-auto h-10 w-auto"
-          />
-          <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
-            Welocome Back
-          </h2>
-          <p className="text-center mt-1 text-sm/6 text-gray-600">
+      <div className=" w-auto mx-2 ">
+        {onSuccess ? success() : null}
+        <div className="space-y-0">
+          <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
+            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+              {/* <img
+                alt="Your Company"
+                src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
+                className="mx-auto h-10 w-auto"
+              /> */}
+              <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+                Welocome Back
+              </h2>
+              <p className="text-center mt-1 text-sm/6 text-gray-600">
                 Login to your account with login Credentials
-            </p>
-        </div>
+              </p>
+            </div>
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form action="#" method="POST" className="space-y-6">
-            <div>
-              <label
+            <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+              <InputField
+                span={2}
                 htmlFor="email"
-                className="block text-sm/6 font-medium text-gray-900"
+                label="Email Address"
+                placeholder={"Ex: abc123@gmail.com"}
+                type="email"
+                name={"email"}
+                id="email"
+                value={loginDetails.email}
+                handleOnChange={handleOnChange}
+              />
+            </div>
+
+            <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+              <InputField
+                span={2}
+                htmlFor="password"
+                label="Password"
+                placeholder={"Ex: abc123"}
+                type="password"
+                name={"password"}
+                id="password"
+                value={loginDetails.password}
+                handleOnChange={handleOnChange}
+              />
+            </div>
+            <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+              <DropDown
+                span={2}
+                htmlFor={"account_type"}
+                label={"Account Type"}
+                autoComplete={"account_type"}
+                id={"account_type"}
+                name={"account_type"}
+                options={["Student", "Lecturer"]}
+                handleOnChange={handleOnChange}
+              />
+            </div>
+            <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+              <a
+                href="#"
+                className="font-semibold text-indigo-600 hover:text-indigo-500"
               >
-                Email address
-              </label>
-              <div className="mt-2">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                />
-              </div>
+                Forgot password?
+              </a>
             </div>
-
-            <div>
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Password
-                </label>
-                <div className="text-sm">
-                  <a
-                    href="#"
-                    className="font-semibold text-indigo-600 hover:text-indigo-500"
-                  >
-                    Forgot password?
-                  </a>
-                </div>
-              </div>
-              <div className="mt-2">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  autoComplete="current-password"
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                />
-              </div>
-            </div>
-
-            <div>
+            <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
               <button
-                type="submit"
-                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                type="button"
+                onClick={handleLogin}
+                className="flex w-full m-auto justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 Sign in
               </button>
             </div>
-          </form>
 
-          <p className="mt-10 text-center text-sm/6 text-gray-500">
-            Don't have an account ?{" "}
-            <Link to="/register"><a
-              href="#"
-              className="font-semibold text-indigo-600 hover:text-indigo-500"
-            >
-              Click here to Register
-            </a>
-            </Link>
-          </p>
+            <p className="mt-5 text-center text-sm/6 text-gray-500">
+              Don't have an account ?{" "}
+              <Link to="/register">
+                <a
+                  href="#"
+                  className="font-semibold text-indigo-600 hover:text-indigo-500"
+                >
+                  Click here to Register
+                </a>
+              </Link>
+            </p>
+            <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+              {error ? (
+                <ErrorComponent
+                  message={error}
+                  title={errorMsgTitle || "Missing Field!"}
+                />
+              ) : null}
+            </div>
+          </div>
         </div>
-      </div>
-      </div>
       </div>
     </>
   );

@@ -8,12 +8,14 @@ export const AppProvider = ({ children }) => {
   const [activeTab, setActiveTab] = useState("home");
   const [accountType, setAccountType] = useState("");
   const [onlineStatus, setOnlineStatus] = useState(false); //Get Online or offline status
-  const [toggler,setToggler] = useState(false);
+  const [toggler, setToggler] = useState(false);
+  const [qrCode, setQrCode] = useState("");
   const updateTitle = (newTitle) => {
     setTitle(newTitle);
   };
 
-  
+  const [messageBody, setMessageBody] = useState("");
+  const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   return (
     <AppContext.Provider
       value={{
@@ -30,7 +32,13 @@ export const AppProvider = ({ children }) => {
         onlineStatus,
         setOnlineStatus,
         toggler,
-        setToggler
+        setToggler,
+        messageBody,
+        setMessageBody,
+        isSideBarOpen,
+        setIsSideBarOpen,
+        qrCode,
+        setQrCode,
       }}
     >
       {children}

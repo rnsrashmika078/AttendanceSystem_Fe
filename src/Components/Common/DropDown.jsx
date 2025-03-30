@@ -1,7 +1,16 @@
 import React from "react";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
-function DropDown({span,htmlFor,label,id,name,autoComplete,options,handleOnChange}) {
+function DropDown({
+  span,
+  htmlFor,
+  label,
+  id,
+  name,
+  autoComplete,
+  options,
+  handleOnChange,
+}) {
   return (
     <div className={`sm:col-span-${span}`}>
       <label
@@ -14,14 +23,21 @@ function DropDown({span,htmlFor,label,id,name,autoComplete,options,handleOnChang
         <select
           id={id}
           name={name}
-          onChange={(e)=> handleOnChange(e)}
+          // value={currentSelection || ""}
+          onChange={handleOnChange}
           autoComplete={autoComplete}
           className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
         >
-           <option contentEditable={false} selected={true}  disabled={true} >Choose {label}</option>
-          {options.map((item,index)=>(
-              <option key={index} vaue={item}>{item}</option>
-          ))}
+          <option contentEditable={false} selected={true} disabled={true}>
+            Choose {label}
+          </option>
+          {options
+            ? options.map((item, index) => (
+                <option key={index} value={item}>
+                  {item}
+                </option>
+              ))
+            : null}
         </select>
         <ChevronDownIcon
           aria-hidden="true"

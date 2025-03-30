@@ -1,12 +1,13 @@
 import React from 'react'
-import { useAppContext } from '../AppContext/AppContext';
+// import { useAppContext } from '../AppContext/AppContext';
 function SummaryProfile({user}) {
     // const { user, token } =useAppContext();
 
   return (
     <>
       <div className="profile-card">
-        <img src={`/${user?.dp}`}
+        {/* <img src={`/${user?.dp}`} */}
+        <img src={`/profile.png`}
           alt="Profile Avatar" className="avatar" />
           <h2>{user?.init_name || "Add Your Name"}</h2>
           <p>{user?.account_type || "Add Your Role"}</p>
