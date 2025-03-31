@@ -21,6 +21,7 @@ import GeneratePDF from "./Components/DashboardComponents/QR/GeneratePDF.jsx";
 import { useContext } from "react";
 import Test from "./Components/DashboardComponents/QR/Test.jsx";
 
+
 function App() {
   //Temp
   const user = true;
@@ -35,16 +36,18 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/1" element={<LandingPageV2 />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register lec_code={"lec100"} />}/>
+            <Route
+              path="/register"
+              element={<Register lec_code={"lec100"} />}
+            />
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/ai" element={<Gemini />}></Route>
               <Route path="/scanner" element={<QrScanner />}></Route>
               <Route path="/generator" element={<QrGenerator />}></Route>
-              <Route path="/pdf" element={<GeneratePDF />}></Route>
             </Route>
             <Route path="/test" element={<Test />}></Route>
-
+            <Route path="/pdf" element={<GeneratePDF sub_code={"CIS20221"}/>}></Route>
           </Routes>
         </BrowserRouter>
       </AuthProvider>

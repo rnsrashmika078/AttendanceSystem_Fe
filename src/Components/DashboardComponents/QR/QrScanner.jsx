@@ -9,7 +9,11 @@ function QrScanner() {
   const [id, setId] = useState("");
   const [scandata, setScanData] = useState([]);
   const [notifier, setNotifer] = useState("");
+  const [attempt, setAttempt] = useState(0);
+  const [finish, setFinish] = useState();
 
+  const localSucces = localStorage.getItem("success");
+  const todayDate = new Date().toLocaleDateString("en-CA");
   const [attendance, setAttendance] = useState({
     attendance: "",
     subject_code: "",
@@ -17,19 +21,67 @@ function QrScanner() {
     student_name: "",
   });
 
-  const [valid, setValid] = useState(false);
-  //Get QR Code
+  const [attendanceResult, setAttendaceResult] = useState([]);
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     if (scanResult) {
       setId(scanResult?.slice(8, 16));
+      localStorage.setItem("id", scanResult?.slice(8, 16));
     }
   }, [scanResult]);
+
+  const fetchRecords = async () => {
+    try {
+      const response = await fetch(
+        // `http://localhost:8000/api/get_record_history/${todayDate}/${id}`,
+        `http://localhost:8000/api/get_record_history/${todayDate}/${localStorage.getItem(
+          "id"
+        )}`,
+
+        {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error while retriieveing Records!");
+      }
+      const responseData = await response.json();
+      if (responseData) {
+        if (responseData.data) {
+          if (responseData?.data[0]?.status === "Finished") {
+            setFinish(true);
+            localStorage.removeItem("success");
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (!finish) {
+      console.log("Not Finished");
+      const timeInterval = setInterval(() => {
+        fetchRecords();
+      }, 1000);
+      return () => clearInterval(timeInterval);
+    }
+    console.log("Finished");
+
+    
+  }, []);
 
   useEffect(() => {
     if (scanResult) {
       if (scandata?.qr_code === scanResult) {
-        setValid(true);
+        setSuccess(true);
+        setAttempt(attempt + 1);
         const updatedAttendance = {
           attendance: "true",
           subject_code: id,
@@ -51,7 +103,8 @@ function QrScanner() {
           })
           .catch((error) => {});
       } else {
-        setValid(false);
+        setAttempt(attempt + 1);
+        setSuccess(false);
         setAttendance(null);
       }
     }
@@ -63,6 +116,14 @@ function QrScanner() {
     }
   }, [id]);
 
+  useEffect(() => {
+    if (!success) {
+      return;
+    }
+    // localstorage use for temporarily
+    localStorage.setItem("success", true);
+  }, [success]);
+
   const updatedQrCode = async () => {
     await fetch(`http://localhost:8000/api/qr_get/${id}`, {
       method: "GET",
@@ -72,30 +133,31 @@ function QrScanner() {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
-        setScanData(data.data);
+        if (data) {
+          setScanData(data.data);
+        }
       })
-      .catch((error) => {
-        alert(error);
-      });
+      .catch((error) => {});
   };
   useEffect(() => {
-    const scanner = new Html5QrcodeScanner("reader", {
-      qrbox: {
-        width: 250,
-        height: 250,
-      },
-      fps: 5,
-    });
+    if (!localSucces) {
+      const scanner = new Html5QrcodeScanner("reader", {
+        qrbox: {
+          width: 250,
+          height: 250,
+        },
+        fps: 5,
+      });
 
-    scanner.render(success, error);
+      scanner.render(success, error);
 
-    function success(result) {
-      scanner.clear();
-      setScanResult(result);
-    }
-    function error(err) {
-      console.log(err);
+      function success(result) {
+        scanner.clear();
+        setScanResult(result);
+      }
+      function error(err) {
+        console.log(err);
+      }
     }
   }, []);
 
@@ -113,83 +175,113 @@ function QrScanner() {
             </p>
             {/* Return : <a>{qrCode ? qrCode : "null"}</a> */}
             <div className="w-full flex m-auto justify-center align-middletext-center">
-              {scanResult ? (
-                valid ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    shapeRendering="geometricPrecision"
-                    textRendering="geometricPrecision"
-                    imageRrendering="optimizeQuality"
-                    fillRule="evenodd"
-                    clipRrule="evenodd"
-                    viewBox="0 0 512 512"
-                    width="256"
-                    height="256"
-                  >
-                    <path
-                      fill="#3AAF3C"
-                      d="M256 0c141.39 0 256 114.61 256 256S397.39 512 256 512 0 397.39 0 256 114.61 0 256 0z"
-                    />
-                    <path
-                      fill="#0DA10D"
-                      fillRule="nonzero"
-                      d="M391.27 143.23h19.23c-81.87 90.92-145.34 165.89-202.18 275.52-29.59-63.26-55.96-106.93-114.96-147.42l22.03-4.98c44.09 36.07 67.31 76.16 92.93 130.95 52.31-100.9 110.24-172.44 182.95-254.07z"
-                    />
-                    <path
-                      fill="#fff"
-                      fillRule="nonzero"
-                      d="M158.04 235.26c19.67 11.33 32.46 20.75 47.71 37.55 39.53-63.63 82.44-98.89 138.24-148.93l5.45-2.11h61.06c-81.87 90.93-145.34 165.9-202.18 275.53-29.59-63.26-55.96-106.93-114.96-147.43l64.68-14.61z"
-                    />
-                  </svg>
-                ) : scandata?.qr_code === "finished" ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    shape-rendering="geometricPrecision"
-                    text-rendering="geometricPrecision"
-                    image-rendering="optimizeQuality"
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    viewBox="0 0 512 512"
-                     width="256"
-                    height="256"
-                  >
-                    <path
-                      fill="#848484"
-                      d="M74.981 74.981c99.976-99.975 262.063-99.975 362.038 0 99.975 99.976 99.975 262.063 0 362.038-99.975 99.975-262.062 99.975-362.038 0-99.975-99.975-99.975-262.063 0-362.038zm270.295 91.742l.003.003c8.86 8.86 8.819 23.415.003 32.232l-57.043 57.043 59.133 59.133c8.861 8.861 8.856 23.375-.002 32.233l-.003.002c-8.86 8.861-23.417 8.818-32.232.003l-59.134-59.134-57.041 57.041c-8.816 8.816-23.411 8.823-32.234 0l-.003-.003c-8.824-8.823-8.865-23.37 0-32.234l57.041-57.041-59.133-59.132c-8.815-8.816-8.821-23.414 0-32.235l.003-.003c8.821-8.821 23.372-8.863 32.235 0l59.133 59.132 57.043-57.043c8.861-8.862 23.375-8.853 32.231.003z"
-                    />
-                  </svg>
+              {scanResult || localSucces ? (
+                localSucces ? (
+                  // Green Success
+                  <div>
+                    <div className="flex align-middle justify-center text-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        shapeRendering="geometricPrecision"
+                        textRendering="geometricPrecision"
+                        imageRrendering="optimizeQuality"
+                        fillRule="evenodd"
+                        clipRrule="evenodd"
+                        viewBox="0 0 512 512"
+                        width="256"
+                        height="256"
+                      >
+                        <path
+                          fill="#3AAF3C"
+                          d="M256 0c141.39 0 256 114.61 256 256S397.39 512 256 512 0 397.39 0 256 114.61 0 256 0z"
+                        />
+                        <path
+                          fill="#0DA10D"
+                          fillRule="nonzero"
+                          d="M391.27 143.23h19.23c-81.87 90.92-145.34 165.89-202.18 275.52-29.59-63.26-55.96-106.93-114.96-147.42l22.03-4.98c44.09 36.07 67.31 76.16 92.93 130.95 52.31-100.9 110.24-172.44 182.95-254.07z"
+                        />
+                        <path
+                          fill="#fff"
+                          fillRule="nonzero"
+                          d="M158.04 235.26c19.67 11.33 32.46 20.75 47.71 37.55 39.53-63.63 82.44-98.89 138.24-148.93l5.45-2.11h61.06c-81.87 90.93-145.34 165.9-202.18 275.53-29.59-63.26-55.96-106.93-114.96-147.43l64.68-14.61z"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h1>
+                        {notifier
+                          ? notifier
+                          : "Your attendance has already been marked successfully!"}
+                      </h1>
+                    </div>
+                  </div>
+                ) : !scandata ? (
+                  // Gray Error -> Expired
+                  <div>
+                    <div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        shape-rendering="geometricPrecision"
+                        text-rendering="geometricPrecision"
+                        image-rendering="optimizeQuality"
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        viewBox="0 0 512 512"
+                        width="256"
+                        height="256"
+                      >
+                        <path
+                          fill="#848484"
+                          d="M74.981 74.981c99.976-99.975 262.063-99.975 362.038 0 99.975 99.976 99.975 262.063 0 362.038-99.975 99.975-262.062 99.975-362.038 0-99.975-99.975-99.975-262.063 0-362.038zm270.295 91.742l.003.003c8.86 8.86 8.819 23.415.003 32.232l-57.043 57.043 59.133 59.133c8.861 8.861 8.856 23.375-.002 32.233l-.003.002c-8.86 8.861-23.417 8.818-32.232.003l-59.134-59.134-57.041 57.041c-8.816 8.816-23.411 8.823-32.234 0l-.003-.003c-8.824-8.823-8.865-23.37 0-32.234l57.041-57.041-59.133-59.132c-8.815-8.816-8.821-23.414 0-32.235l.003-.003c8.821-8.821 23.372-8.863 32.235 0l59.133 59.132 57.043-57.043c8.861-8.862 23.375-8.853 32.231.003z"
+                        />
+                      </svg>
+                      <div>
+                        <h1>Session Expired!</h1>
+                      </div>
+                    </div>
+                  </div>
                 ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    shape-rendering="geometricPrecision"
-                    text-rendering="geometricPrecision"
-                    image-rendering="optimizeQuality"
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    viewBox="0 0 512 512"
-                    width="256"
-                    height="256"
-                  >
-                    <path
-                      fill="#FD3B3B"
-                      d="M74.981 74.981c99.976-99.975 262.063-99.975 362.038 0 99.975 99.976 99.975 262.063 0 362.038-99.975 99.975-262.062 99.975-362.038 0-99.975-99.975-99.975-262.063 0-362.038zm270.295 91.742l.003.003c8.86 8.86 8.819 23.415.003 32.232l-57.043 57.043 59.133 59.133c8.861 8.861 8.856 23.375-.002 32.233l-.003.002c-8.86 8.861-23.417 8.818-32.232.003l-59.134-59.134-57.041 57.041c-8.816 8.816-23.411 8.823-32.234 0l-.003-.003c-8.824-8.823-8.865-23.37 0-32.234l57.041-57.041-59.133-59.132c-8.815-8.816-8.821-23.414 0-32.235l.003-.003c8.821-8.821 23.372-8.863 32.235 0l59.133 59.132 57.043-57.043c8.861-8.862 23.375-8.853 32.231.003z"
-                    />
-                  </svg>
+                  // red error -> invalid QR Scan
+                  <div>
+                    <div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        shape-rendering="geometricPrecision"
+                        text-rendering="geometricPrecision"
+                        image-rendering="optimizeQuality"
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        viewBox="0 0 512 512"
+                        width="256"
+                        height="256"
+                      >
+                        <path
+                          fill="#FD3B3B"
+                          d="M74.981 74.981c99.976-99.975 262.063-99.975 362.038 0 99.975 99.976 99.975 262.063 0 362.038-99.975 99.975-262.062 99.975-362.038 0-99.975-99.975-99.975-262.063 0-362.038zm270.295 91.742l.003.003c8.86 8.86 8.819 23.415.003 32.232l-57.043 57.043 59.133 59.133c8.861 8.861 8.856 23.375-.002 32.233l-.003.002c-8.86 8.861-23.417 8.818-32.232.003l-59.134-59.134-57.041 57.041c-8.816 8.816-23.411 8.823-32.234 0l-.003-.003c-8.824-8.823-8.865-23.37 0-32.234l57.041-57.041-59.133-59.132c-8.815-8.816-8.821-23.414 0-32.235l.003-.003c8.821-8.821 23.372-8.863 32.235 0l59.133 59.132 57.043-57.043c8.861-8.862 23.375-8.853 32.231.003z"
+                        />
+                      </svg>
+                      <div>
+                        <h1>Invalid QR Code</h1>
+                      </div>
+                    </div>
+                  </div>
                 )
-              ) : (
+              ) : localSucces ? null : (
                 <div className="text-center" id="reader"></div>
               )}
             </div>
             <div>
-              <h1>
-                {valid
-                  ? notifier
-                  : scandata?.qr_code === "finished"
-                  ? "Session Expired!"
-                  : "Invalid QR Code!"}
-              </h1>
-              <a>{valid ? scanResult : null}</a>
+              {scanResult
+                ? scanResult
+                : localStorage.getItem("id")
+                ? localStorage.getItem("id")
+                : "NO SCAN RESULT"}
             </div>
+            {/* <div>
+              {!success || !localSucces ? (
+                <h1>{sessionExpired ? "Session Expired!" : ""}</h1>
+              ) : null}
+            </div> */}
           </div>
         </div>
       </div>

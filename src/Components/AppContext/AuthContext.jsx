@@ -6,6 +6,8 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [successTime, setSuccessTime] = useState();
 
   const decrypt = (secretKey, encryptedToken, encryptedUser) => {
     const bytesToken = CryptoJS.AES.decrypt(encryptedToken, secretKey);
@@ -19,17 +21,27 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
-    
+
     if (storedToken && storedUser) {
-      const { token: newToken, user: newUser } = decrypt("abc", storedToken, storedUser);
+      const { token: newToken, user: newUser } = decrypt(
+        "abc",
+        storedToken,
+        storedUser
+      );
       setToken(newToken);
       setUser(newUser);
     }
   }, []);
 
-  useEffect(()=>{
-    console.log("Stored Token in localStorage:",token);
-  },[token])
+  useEffect(() => {
+    const storedSuccess = localStorage.getItem("success");
+    const storedSuccessTime = localStorage.getItem("successTime");
+
+    if (storedSuccess && storedSuccessTime) {
+      setIsSuccess(storedSuccess);
+      setSuccessTime(storedSuccessTime);
+    }
+  }, []);
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -39,7 +51,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, setUser, setToken, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        setUser,
+        setToken,
+        logout,
+        isSuccess,
+        successTime,
+        setIsSuccess,
+        setSuccessTime,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

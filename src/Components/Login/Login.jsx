@@ -52,11 +52,6 @@ const Login = () => {
     }
   }, [navigate, token]);
 
-  useEffect(() => {
-    if (token) {
-      alert(token)
-    }
-  }, [token]);
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");

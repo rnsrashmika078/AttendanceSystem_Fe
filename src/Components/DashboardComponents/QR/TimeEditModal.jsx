@@ -7,12 +7,8 @@ function TimeEditModal({
   currentMinute,
   currentSecond,
 }) {
-  const TimeOptions = [
-    1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-  ];
-
-  //   const [currentMinute, setCurrentMinute] = useState(11);
-  //   const [currentSecond, setCurrentSecond] = useState(0);
+  const [currentMinuteModal, setCurrentMinuteModal] = useState(currentMinute);
+  const [currentSecondModal, setCurrentSecondModal] = useState(currentSecond);
 
   const handleTimeChange = (type) => {
     switch (type) {
@@ -32,44 +28,58 @@ function TimeEditModal({
   };
 
   const updateTimer = () => {
-    if (currentMinute == 1 && currentSecond == 1) {
+    if (
+      currentMinuteModal == 0 &&
+      currentSecondModal >= 0 &&
+      currentSecondModal <= 59
+    ) {
       return;
     } else {
+      setCurrentMinute(currentMinuteModal);
+      setCurrentSecond(currentSecondModal);
       setEditTimer(false);
     }
   };
 
   const minuteUp = () => {
-    let cur_min = currentMinute + 1;
+    let cur_min = currentMinuteModal + 1;
     if (cur_min >= 0 && cur_min <= 20) {
-      setCurrentMinute(cur_min);
+      // if (cur_min === 1) {
+      //   alert("Aleast Minute is the minimum from up");
+      //   return
+      // }
+      setCurrentMinuteModal(cur_min);
     } else {
-      setCurrentMinute(0);
+      setCurrentMinuteModal(0);
     }
   };
   const minDown = () => {
-    let cur_min = currentMinute - 1;
+    let cur_min = currentMinuteModal - 1;
     if (cur_min >= 0 && cur_min <= 20) {
-      setCurrentMinute(cur_min);
+      // if (cur_min === 0) {
+      //   alert("Aleast Minute is the minimum from down");
+      //   return
+      // }
+      setCurrentMinuteModal(cur_min);
     } else {
-      setCurrentMinute(20);
+      setCurrentMinuteModal(20);
     }
   };
 
   const secUp = () => {
-    let cur_sec = currentSecond + 1;
+    let cur_sec = currentSecondModal + 1;
     if (cur_sec >= 0 && cur_sec <= 59) {
-      setCurrentSecond(cur_sec);
+      setCurrentSecondModal(cur_sec);
     } else {
-      setCurrentSecond(0);
+      setCurrentSecondModal(0);
     }
   };
   const secDown = () => {
-    let cur_sec = currentSecond - 1;
+    let cur_sec = currentSecondModal - 1;
     if (cur_sec >= 0 && cur_sec <= 59) {
-      setCurrentSecond(cur_sec);
+      setCurrentSecondModal(cur_sec);
     } else {
-      setCurrentSecond(59);
+      setCurrentSecondModal(59);
     }
   };
 
@@ -132,13 +142,13 @@ function TimeEditModal({
 
               {/* Timer */}
               <h1 className="text-center text-5xl font-bold ">
-                {currentMinute?.toString().length < 2
-                  ? `0${currentMinute}`
-                  : currentMinute}{" "}
+                {currentMinuteModal?.toString().length < 2
+                  ? `0${currentMinuteModal}`
+                  : currentMinuteModal}{" "}
                 :{" "}
-                {currentSecond?.toString().length < 2
-                  ? `0${currentSecond}`
-                  : currentSecond}{" "}
+                {currentSecondModal?.toString().length < 2
+                  ? `0${currentSecondModal}`
+                  : currentSecondModal}{" "}
               </h1>
 
               {/* Minute Down */}
@@ -191,7 +201,7 @@ function TimeEditModal({
                 Set
               </button>
               <button
-                onClick={()=>setEditTimer(false)}
+                onClick={() => setEditTimer(false)}
                 className="text-white bg-gray-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center  dark:hover:bg-gray-700 dark:focus:ring-blue-800"
               >
                 Close

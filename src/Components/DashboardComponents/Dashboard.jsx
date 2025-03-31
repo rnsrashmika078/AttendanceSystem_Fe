@@ -13,7 +13,6 @@ import SummaryProfile from "./SummaryProfile";
 //   { id: 2, name: "Assets under holding", value: "$119 trillion" },
 //   { id: 3, name: "New users annually", value: "46,000" },
 // ];
-
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
   return (

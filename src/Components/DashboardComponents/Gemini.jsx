@@ -46,7 +46,6 @@ const Gemini = () => {
 
   return (
     <div className="bg-gray-100 py-2 px-2">
-      <p>{qrCode ? qrCode : "Null"}</p>
       <div className="max-w-lg mx-auto bg-gray-200 px-5  text-black p-6 rounded-2xl shadow-1xl text-center w-full">
         <h2 className="text-2xl font-bold mb-4 px-auto ">AI Assistant</h2>
         {/* {!isOpen ? (

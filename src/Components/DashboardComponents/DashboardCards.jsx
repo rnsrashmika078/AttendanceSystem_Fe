@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+import QrScanner from "./QR/QrScanner";
 
 function DashboardCards({
   label,
@@ -10,11 +11,52 @@ function DashboardCards({
   disable,
 }) {
   const navigate = useNavigate();
+  const [scandata, setScanData] = useState([]);
+
+  const success = localStorage.getItem("success");
+  const successTime = localStorage.getItem("successTime");
+
+
+  // const minutes = parseInt(successTime.slice(3,5))
+
+  // const [successTime, setSuccessTime] = useState("");
+  useEffect(() => {
+    if (success) {
+      const timeNow = new Date().toLocaleTimeString();
+      // setSuccessTime(timeNow)
+    }
+  }, [success]);
+  // useEffect(() => {
+  //   if (success) {
+  //     const interval = setInterval(() => {
+  //       const currentTime = new Date();
+  //       if (currentTime === currentTime.getMinutes()) {
+  //         return;
+  //       }
+  //       currentTime.setHours(currentTime);
+  //       setTime(currentTime.toLocaleTimeString());
+  //     }, [1000]);
+  //     return () => clearInterval(interval);
+  //   }
+  // }, []);
 
   return (
     <div className="bg-gray-100 w-full p-1 flex justify-center">
       <div className="bg-gray-100 py-2 px-2">
         <div className="relative min-h-50 w-full flex flex-col justify-center items-center  bg-white shadow-sm border border-slate-200 rounded-lg px-2">
+          {identy === "scanner" ? (
+            <div className="absolute left-0.5 top-1 w-1/2">
+              <li
+                href="#"
+                className={`block text-left px-4 py-2 text-xs sm:text-1xl font-bold 
+             bg-amber-600 
+           rounded-r-2xl w-1/2 m-1 text-white   data-focus:outline-hidden`}
+              >
+                {successTime}
+              </li>
+            </div>
+          ) : null}
+
           {account_type === "Student" ? (
             label ? (
               <div className="absolute left-0.5 top-1 w-1/2">
