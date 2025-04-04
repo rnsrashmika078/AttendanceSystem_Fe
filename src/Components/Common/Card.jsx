@@ -140,8 +140,8 @@ export default function Card() {
       ) : null}
       {currentDate()}
       {DaySelection(handleMoveLeft, handleMoveRight, currentDay)}
-      {YearSelection(setStudyYear, studyYear)}
-      {Cards(fetchData, start, end, studyYear, handleCardClick)}
+      {/* {YearSelection(setStudyYear, studyYear)} */}
+      {/* {Cards(fetchData, start, end, studyYear, handleCardClick)} */}
     </div>
   );
 }

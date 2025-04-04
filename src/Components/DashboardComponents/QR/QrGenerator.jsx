@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import QRCode from "react-qr-code";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import QRForm from "./QRForm";
@@ -7,9 +7,14 @@ import GeneratePDF from "./GeneratePDF";
 
 import { useNavigate } from "react-router-dom";
 import { update } from "lodash";
+import { AuthContext } from "../../AppContext/AuthContext";
+import Timer from "./Timer";
 
 function QrGenerator() {
   //Content API
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+  const { exitFromBrowser } = useContext(AuthContext);
 
   const [currentState, setCurrentState] = useState(false); //To track whether start click or not
   const [code, setCode] = useState("");
@@ -25,6 +30,7 @@ function QrGenerator() {
   const [step, setStep] = useState(0); // this for debug purpose
   const [subCode, setSubCode] = useState("");
   const [viewAttendance, setViewAttendance] = useState(false);
+  // const [qrTime,setQrTime] = useState(5000);
 
   const navigate = useNavigate();
 
@@ -42,51 +48,65 @@ function QrGenerator() {
       // navigate("/pdf");
     }
   };
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = "Are you sure you want to leave?";
+    };
 
-  const updatedQrRecordHistory = async () => {
+    const handleUnload = () => {
+      console.log("User left the page");
+      exitFromBrowser();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("unload", handleUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("unload", handleUnload);
+    };
+  }, []);
+
+  const QrChangeTime = (e) => {
+    const { value } = e.target;
+    setQrTime(value);
+  };
+  const updatedQrRecordHistory = async (status) => {
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/create_qr_record",
-        {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json",
-          },
-          body: JSON.stringify({ sub_code: subCode, status: "Finished" }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}create_qr_record/${subCode}`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({ sub_code: subCode, status: status}),
+      });
 
       if (!response.headers) {
         throw new Error("Error while getting response from !");
       }
       const data = await response.json();
       if (data) {
-        alert(data)
       }
-    } catch (error) {
-      alert(error);
-    }
+    } catch (error) {}
   };
   const updatedQrCode = async (custom) => {
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/qr_update/${subCode}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            qr_code: custom
-              ? custom
-              : reset
-              ? "reset"
-              : finished
-              ? "finished"
-              : currentState
-              ? "ready"
-              : code,
-          }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}qr_update/${subCode}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          qr_code: custom
+            ? custom
+            : reset
+            ? "reset"
+            : finished
+            ? "finished"
+            : currentState
+            ? "ready"
+            : code,
+        }),
+      });
 
       if (!response.ok) throw new Error("Failed to update QR");
 
@@ -97,15 +117,12 @@ function QrGenerator() {
     }
   };
 
-  const deletQrCode = async () => {
+  const deleteQrCode = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/qr_delete/${subCode}`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}qr_delete/${subCode}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
 
       if (!response.ok) throw new Error("Failed to delete QR");
 
@@ -119,6 +136,7 @@ function QrGenerator() {
   useEffect(() => {
     if (currentState || start || code) {
       updatedQrCode();
+      console.log("Qr Code Updated!")
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentState, start, code]);
@@ -126,6 +144,10 @@ function QrGenerator() {
   useEffect(() => {
     if (!finished && minutes === 0 && seconds === 0) {
       setFinished(true);
+    }
+    if(finished){
+      console.log(finished)
+
     }
   }, [minutes, seconds, finished]);
 
@@ -161,22 +183,24 @@ function QrGenerator() {
     setStep(0);
     setReset(true);
     updatedQrCode("reset");
-
+    updatedQrRecordHistory("Reset")
     clearTimeout();
   };
+  // 2 reqeuset when click reset 
 
   const handleOnChange = (e) => {
     const { value } = e.target;
     setCode(value);
   };
 
+// 2 request when finished
   useEffect(() => {
     const time = step <= 0 ? 5000 : 30000;
     // const time = 15000;
     if (finished) {
-      updatedQrRecordHistory();
-      deletQrCode();
-
+      updatedQrRecordHistory("Finished");
+      console.log("delete")
+      deleteQrCode();
       return;
     }
     if (currentState || start) {
@@ -190,7 +214,6 @@ function QrGenerator() {
     }
   }, [finished, reset, currentState, step, subCode, start]);
 
-  useEffect(() => {}, [code]);
   const displayQRCode = () => {
     return (
       <>
@@ -252,113 +275,7 @@ function QrGenerator() {
             />
           ) : null}
           {initialize ? (
-            <div
-              style={{
-                background: "white",
-                padding: "16px",
-                display: "flex",
-                flexDirection: "column",
-                margin: "auto",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "fixed",
-                inset: 0,
-              }}
-            >
-              <div className="flex justify-center align-center gap-5">
-                <button
-                  id={finished ? "extends" : "edit"}
-                  disabled={currentState || finished || start ? true : false}
-                  onClick={handleSetEditTimer}
-                  className={
-                    currentState || start || finished
-                      ? "text-gray-500  bg-gray-300 w-full sm:w-auto px-5 py-2.5 border-0 rounded-xl"
-                      : "text-white bg-dark hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-black dark:hover:bg-gray-800 dark:focus:ring-blue-800"
-                  }
-                >
-                  {finished ? "Extend the Timer" : "Edit Timer"}
-                </button>
-              </div>
-              <div
-                className={
-                  minutes < 5 ? "text-7xl text-red-600 py-2" : "text-7xl py-2"
-                }
-              >
-                {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
-              </div>
-              {finished ? (
-                <div>
-                  <div
-                    className="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3"
-                    role="alert"
-                  >
-                    <p className="font-bold text-center text-3xl">
-                      TIME IS UP!
-                    </p>
-                    <p className="text-center text-2xl">
-                      Thanks you for your cooperation
-                    </p>
-                  </div>
-                  <div className="flex justify-center align-center gap-5 p-2">
-                    <button
-                      onClick={handleFinish}
-                      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    >
-                      View Attendance Sheet
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  {start && !finished ? (
-                    displayQRCode()
-                  ) : (
-                    <h1
-                      className={
-                        counter < 4
-                          ? "w-full p-5 text-center font-extralight"
-                          : "w-full p-5 text-center font-extralight"
-                      }
-                    >
-                      {counter < 4 ? (
-                        <span>
-                          {" "}
-                          QR Code Display in{" "}
-                          <span className="text-2xl font-bold text-red-600">
-                            {counter}
-                          </span>{" "}
-                          seconds{" "}
-                        </span>
-                      ) : (
-                        <span>
-                          {"QR Code will display here once click Start"}{" "}
-                        </span>
-                      )}
-                    </h1>
-                  )}
-
-                  <div className="flex justify-center align-center gap-5">
-                    <button
-                      disabled={currentState || start ? true : false}
-                      className={
-                        currentState || start
-                          ? "text-gray-500  bg-gray-300 w-full sm:w-auto px-5 py-2.5 border-0 rounded-xl"
-                          : "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                      }
-                      onClick={() => handleStartTimer(true)}
-                    >
-                      Start
-                    </button>
-                    <button
-                      className="text-white bg-gray-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center  dark:hover:bg-gray-700 dark:focus:ring-blue-800"
-                      onClick={handleResetTimer}
-                    >
-                      Reset
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <Timer finished={finished} currentState={currentState} start={start}  minutes={minutes} seconds={seconds} counter={counter} handleFinish={handleFinish} handleStartTimer={handleStartTimer} handleSetEditTimer={handleSetEditTimer} handleResetTimer={handleResetTimer} displayQRCode={displayQRCode}/>
           ) : (
             //   Form to setup QR
             <QRForm setInitialize={setInitialize} setSubCode={setSubCode} />

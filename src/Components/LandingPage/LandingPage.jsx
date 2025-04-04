@@ -1,21 +1,13 @@
-// import { useEffect } from 'react';
-import "./landingpage.css";
-// import { useNavigate } from 'react-router-dom';
-// import { useAppContext } from '../AppContext/AppContext.jsx';
-function LandingPage() {
-  // const { activeTab , setActiveTab} = useAppContext();
-  // const navigate = useNavigate();
+import { useContext } from "react";
+import "./landingpage.css"
+import { AuthContext } from "../AppContext/AuthContext";
+import { useNavigate } from "react-router-dom";
+const LandingPage = () => {
 
+  const { token } = useContext(AuthContext);
+  const navigate = useNavigate();
   const handleLoginClick = () => {
-    // const tokenValid = localStorage.getItem('token')
-    // if(tokenValid){
-    //     navigate('/dashboard')
-    //     setActiveTab('dashboard')
-    // }
-    // else{
-    //     setActiveTab('login')
-    //     navigate('/login');
-    // }
+    navigate('/dashboard')
   };
   return (
     <>
@@ -32,7 +24,7 @@ function LandingPage() {
                 Create-react-app
               </p>
               <button onClick={handleLoginClick} className="btn-lp">
-                {localStorage.getItem("token")
+                {token
                   ? "GO TO DASHBOARD"
                   : "REGISTER NOW!"}
               </button>

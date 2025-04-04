@@ -11,7 +11,7 @@ export default function Table({ attendance, setAttendaceResult }) {
   });
 
   useEffect(() => {
-    const dateSlice = attendance.map((item) => {
+    const dateSlice = attendance?.map((item) => {
       if (item.created_at) {
         return {
           ...item,
@@ -21,7 +21,7 @@ export default function Table({ attendance, setAttendaceResult }) {
       }
       return item;
     });
-    const defaultSort = dateSlice.sort((a, b) =>
+    const defaultSort = dateSlice?.sort((a, b) =>
       a.student_reg_no.localeCompare(b.student_reg_no)
     );
     setSortData(defaultSort);
@@ -193,7 +193,7 @@ export default function Table({ attendance, setAttendaceResult }) {
               <td className="px-6 py-4 border-1 ">{index + 1}</td>
               <td className="px-6 py-4 border-1 ">{item.student_reg_no}</td>
               <td className="px-6 py-4 border-1 ">{item.student_name}</td>
-              <td className="px-6 py-4 border-1  ">{item.created_at}</td>
+              <td className="px-6 py-4 border-1  ">{new Date(new Date(item.created_at).getTime() + 5.5 * 60 * 60 * 1000).toLocaleString('en-CA')}</td>
               <td className="px-6 py-4 border-1  ">
                 {item.attendance === "true" ? "Present" : "Absent"}
               </td>

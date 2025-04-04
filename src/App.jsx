@@ -20,7 +20,10 @@ import QrGenerator from "./Components/DashboardComponents/QR/QrGenerator.jsx";
 import GeneratePDF from "./Components/DashboardComponents/QR/GeneratePDF.jsx";
 import { useContext } from "react";
 import Test from "./Components/DashboardComponents/QR/Test.jsx";
-
+import Timer from "./Components/DashboardComponents/QR/Timer.jsx";
+import V2_Dashboard from "./Components/Dashboard_New/V2_Dashboard.jsx";
+import DragDrop from "./Components/Dashboard_New/DragDrop.jsx";
+import DragCanvas from "./Components/Dashboard_New/Canvas.jsx";
 
 function App() {
   //Temp
@@ -30,7 +33,7 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           {/* <Nav/> */}
-          {user ? <Nav /> : null}
+          {/* {user ? <Nav /> : null} */}
           {/* <NavBarV2/> */}
           <Routes>
             <Route path="/" element={<LandingPage />} />
@@ -46,8 +49,15 @@ function App() {
               <Route path="/scanner" element={<QrScanner />}></Route>
               <Route path="/generator" element={<QrGenerator />}></Route>
             </Route>
-            <Route path="/test" element={<Test />}></Route>
-            <Route path="/pdf" element={<GeneratePDF sub_code={"CIS20221"}/>}></Route>
+            {/* <Route
+              path="/pdf"
+              element={<GeneratePDF sub_code={"CIS20220"} />}
+            ></Route> */}
+            <Route path="/t1" element={<V2_Dashboard />}></Route>
+            <Route path="/t2" element={<DragDrop />}></Route>
+            <Route path="/t3" element={<DragCanvas />}></Route>
+
+
           </Routes>
         </BrowserRouter>
       </AuthProvider>

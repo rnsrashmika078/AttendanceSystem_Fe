@@ -31,30 +31,33 @@ const Dashboard = () => {
               account_type={user?.account_type}
               identy={"ai"}
               description={
-                "You can ask from AI Assistance about this web application and how to use it"
+                "Ask AI Assistance for help with this web application and its usage."
               }
               content={"Ask From AI"}
             />
             <DashboardCards
               account_type={user?.account_type}
+              label={"Qr Scan"}
               identy={"scanner"}
               description={
-                "Student can Submit Attendance by Scanning QR Code provide by the Lecturer"
+                "Students can submit attendance by scanning the QR code given by the lecturer."
               }
               content={"Submit Attendance"}
             />
-            <DashboardCards
-              account_type={user?.account_type}
-              disable={true}
-              label={
-                user?.account_type === "Lecturer" ?  "Qr Gen" : "Not Available"
-              }
-              identy={"generator"}
-              description={
-                "Lecture can generete and display the QR Code to get the student attendance"
-              }
-              content={"Generate QR Code"}
-            />
+            {user?.account_type === "Lecturer" ? (
+              <DashboardCards
+                account_type={user?.account_type}
+                disable={true}
+                label={
+                  user?.account_type === "Lecturer" ? "Qr Gen" : "Not Available"
+                }
+                identy={"generator"}
+                description={
+                  "Lecture can generete and display the QR Code to get the student attendance"
+                }
+                content={"Generate QR Code"}
+              />
+            ) : null}
           </div>
         </div>
       </div>

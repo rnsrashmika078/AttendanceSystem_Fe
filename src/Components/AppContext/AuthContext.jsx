@@ -8,6 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [successTime, setSuccessTime] = useState();
+  const [sessionData, setSessionData] = useState();
 
   const decrypt = (secretKey, encryptedToken, encryptedUser) => {
     const bytesToken = CryptoJS.AES.decrypt(encryptedToken, secretKey);
@@ -15,12 +16,30 @@ export const AuthProvider = ({ children }) => {
 
     const bytesUser = CryptoJS.AES.decrypt(encryptedUser, secretKey);
     const decryptedUser = JSON.parse(bytesUser.toString(CryptoJS.enc.Utf8));
-
-    return { token: decryptedToken, user: decryptedUser };
+    return {
+      token: decryptedToken,
+      user: decryptedUser,
+    };
   };
+  // const decryptSession = (secretKey, encryptSessionData) => {
+  //   const bytesSessionData = CryptoJS.AES.decrypt(
+  //     encryptSessionData,
+  //     secretKey
+  //   );
+  //   const decryptedString = bytesSessionData.toString(CryptoJS.enc.Utf8);
+  //   if (!decryptedString) {
+  //     return;
+  //   } else {
+  //     try {
+  //       const decryptSessionData = JSON.parse(decryptedString);
+  //       return decryptSessionData;
+  //     } catch (error) {}
+  //   }
+  // };
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
+    const storedSessionData = localStorage.getItem("session");
 
     if (storedToken && storedUser) {
       const { token: newToken, user: newUser } = decrypt(
@@ -31,15 +50,22 @@ export const AuthProvider = ({ children }) => {
       setToken(newToken);
       setUser(newUser);
     }
+
+    // if (storedSessionData) {
+    //   const newSessionData = decryptSession("abc", storedSessionData);
+    //   setSessionData(newSessionData);
+    // }
   }, []);
 
   useEffect(() => {
-    const storedSuccess = localStorage.getItem("success");
-    const storedSuccessTime = localStorage.getItem("successTime");
+    const storedSession = JSON.parse(localStorage.getItem("session"));
 
-    if (storedSuccess && storedSuccessTime) {
-      setIsSuccess(storedSuccess);
-      setSuccessTime(storedSuccessTime);
+    console.log("AUTH RESULT" ,storedSession)
+    // const storedSuccessTime = localStorage.getItem("successTime");
+
+    if (storedSession) {
+      setSessionData(storedSession);
+      // setSuccessTime(storedSuccessTime);
     }
   }, []);
 
@@ -48,6 +74,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("user");
     setUser(null);
     setToken(null);
+  };
+
+  const exitFromBrowser = () => {
+    localStorage.removeItem("session");
+    setSessionData(null);
   };
 
   return (
@@ -62,6 +93,9 @@ export const AuthProvider = ({ children }) => {
         successTime,
         setIsSuccess,
         setSuccessTime,
+        sessionData,
+        setSessionData,
+        exitFromBrowser,
       }}
     >
       {children}

@@ -8,6 +8,9 @@ import { AuthContext } from "../AppContext/AuthContext";
 import CryptoJS from "crypto-js";
 
 const Login = () => {
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+  // const baseURL = "http://192.168.43.230:8000"
   const { token, setToken, setUser } = useContext(AuthContext);
   const [error, setError] = useState("");
   const [onSuccess, setOnSuccess] = useState(false);
@@ -70,7 +73,7 @@ const Login = () => {
       return;
     }
     await fetch(
-      `http://localhost:8000/api/${
+      `${API_BASE_URL}${
         loginDetails?.account_type === "Student"
           ? "student_login"
           : "lecturer_login"

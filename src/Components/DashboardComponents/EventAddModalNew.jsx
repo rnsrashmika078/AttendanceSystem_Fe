@@ -11,6 +11,9 @@ const EventAddModalNew = ({
   HandleNotifier,
   currentDay,
 }) => {
+
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
   //handle form data
   const [newData, setNewData] = useState({
     start_time: "",
@@ -50,7 +53,7 @@ const EventAddModalNew = ({
 
   // handle Save Data coming from edit form
   const handleSave = async () => {
-    await fetch(`http://localhost:8000/api/update/${editItemId}`, {
+    await fetch(`${API_BASE_URL}update/${editItemId}`, {
       method: "PUT",
       headers: {
         "Content-type": "application/json",

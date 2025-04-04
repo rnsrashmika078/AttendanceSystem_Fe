@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import ErrorComponent from "../../Notification/ErrorComponent";
-function QRForm({ setInitialize,setSubCode }) {
+import CryptoJS from "crypto-js";
+function QRForm({ setInitialize, setSubCode }) {
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+  const baseURL = "http://192.168.43.230:8000";
+
+  // Encryption Alogirth -> AES
 
   const [data, setData] = useState({
     ac_year: "",
@@ -12,11 +17,17 @@ function QRForm({ setInitialize,setSubCode }) {
     lec: "",
     lectr: "",
   });
- 
- 
-     
-  
-  let sub_c = data.lec.slice(0,8);
+
+  // const encrypt = (secretKey, data) => {
+  //   const encryptionSession = CryptoJS.AES.encrypt(
+  //     JSON.stringify(data.user),
+  //     secretKey
+  //   ).toString();
+  //   localStorage.setItem("session", encryptionSession);
+
+  // };
+
+  let sub_c = data.lec.slice(0, 8);
   const [error, setError] = useState("");
 
   const [options, setOptions] = useState([]);
@@ -25,6 +36,9 @@ function QRForm({ setInitialize,setSubCode }) {
     const { name, value } = e.target;
     setData({ ...data, [name]: value });
   };
+  useEffect(() => {
+    console.log(data);
+  });
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
@@ -59,28 +73,27 @@ function QRForm({ setInitialize,setSubCode }) {
       setError("Please fill the Lecturer Name");
       return;
     }
-    if(data?.lec){
-      
-      setSubCode(sub_c)
+    if (data?.lec) {
+      setSubCode(sub_c);
     }
 
     setInitialize(true);
-    localStorage.setItem("data", JSON.stringify(data));
-
-
-    fetch('http://localhost:8000/api/qr_create',{
-      method:"POST",
+    if (data) {
+      localStorage.setItem("session", JSON.stringify(data));
+    }
+    console.log("Submit the data");
+    fetch(`${API_BASE_URL}qr_create`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body:JSON.stringify({id:sub_c})
+      body: JSON.stringify({ id: sub_c }),
     })
-    .then(response=>response.json())
-    .then(data=>{
-    })
-    .catch(error=>{
-      alert(error)
-    })
+      .then((response) => response.json())
+      .then((data) => {})
+      .catch((error) => {
+        alert(error);
+      });
   };
   useEffect(() => {
     if (data.batch || data.spec || data.semester) {
@@ -242,7 +255,7 @@ function QRForm({ setInitialize,setSubCode }) {
               />
             </div>
             <button
-              type="submit"
+              type="button"
               onClick={handleSubmit}
               className="flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto justify-center align-middle m-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
@@ -322,6 +335,7 @@ const getOptionByYear = (batch, specialization, semester) => {
 };
 const empty = [];
 const firstYear_firstSem = [
+  " ",
   "Data Structures and Algorithms",
   "Platform Technologiess",
   "Network Switching and Routing",
@@ -334,6 +348,8 @@ const firstYear_firstSem = [
   "Practical for Digital Electronic Systems",
 ];
 const firstYear_secondSem = [
+  " ",
+
   "Software Engineering",
   "ICT Project Management",
   "Artificial Intelligence",
@@ -348,6 +364,8 @@ const firstYear_secondSem = [
   "Practical for Human Computer Interaction",
 ];
 const secondYear_firstSem = [
+  " ",
+
   "Scaling and Connecting Network",
   "Cryptography",
   "Vulnerability Assessment and Penetration Testing-I",
@@ -359,6 +377,7 @@ const secondYear_firstSem = [
 ];
 
 const secondYear_secondSem = [
+  " ",
   "Final Research and Development Project",
   "Advance Software Engineering",
   "Advance Database Management System",
@@ -372,34 +391,47 @@ const secondYear_secondSem = [
   "Risk, Crisis and Security Management",
 ];
 const thirdYear_firstSem = [
-  "CIS24212",
-  "Industrial Automation and ladder Programming",
-  "Computer security and forensics",
-  "Vulnerability assessments and penetration testing-II",
-  "Risk, Crisis and Security Management",
-  "Final Research and Development Project",
-  "Data Analytics and Business Intelligence",
-  "Professional Practice",
-  "Practical for Industrial Automation and ladder Programming",
-  "Practical for Computer security and forensics",
-  "Practical for vulnerability assessments and penetration testing-II",
-  "Secure Network Infrastructure",
-  "Practical for Secure Network Infrastructure",
-  "Introduction to Smart Systems",
+  " ",
+
+  "NST31051 Practical for Cryptography",
+  "UCT31012 Artificial Intelligence",
+  "SWT31012 Software Engineering",
+  "CIS31012 ICT Project Management",
+  "CIS31022 Data Mining",
+  "NST31042 Practical for Scaling and Connecting Network",
+  "CIS31032 Human Computing Interaction",
+  "CIS31051 Practical for Human Computing Interaction",
+  "NST31032 Vulnerability Assessment and Penetration Testing - I",
+  "SWT31022 Software Verification and Quality Assurance",
+  "CIS31041 Practical for Data Mining",
+  "UCT31021 Practical for Artificial Intelligence",
+  "CMS31022 Research Methodology for ICT",
+  "NST31011 Scaling and Connecting Network",
+  "NST31062 Practical for Vulnerability Assessment and Penetration Testing - I",
 ];
 const thirdYear_secondSem = [
-  "CIS20220 Essentials of ICT and PC Applications",
-  "CIS20221 Fundamentals of Programming",
-  "CIS20222 Logic designing and Computer Organization",
-  "Mathematics for ICT",
-  "English I",
-  "Tamil Language(for Sinhala Speaking Students",
-  "Sinhala Language(for Tamil Speaking Students",
-  "Practical for Essentials of ICT and PC Applications",
-  "Practical for Fundamentals of Programming",
-  "Practical for Database Design",
+  " ",
+  "SWT32022 Service Oriented Web Application",
+  "SWT32051 Practical for Service Oriented Web Application",
+  "UCT32011 Embedded system",
+  "SWT32011 Mobile application Development",
+  "NST32012 Wireless Network",
+  "CIS32012 Enterprise Architecture and Leadership",
+  "NST32021 Literature Survey",
+  "SWT32031 Literature Survey",
+  "UCT32022 Practical for Embedded system",
+  "SWT32042 Practical for Mobile application Development",
+  "NST32031 Practical for Wireless Network",
+  "NST32042 Information Systems security",
+  "NST32052 Information Security Auditing",
+  "UCT32031 Cognitive neural networks",
+  "NST32061 Network Planning and Simulation",
+  "UCT32042 Practical for Cognitive neural networks",
+  "NST32072 Practical for Network Planning and Simulation",
 ];
 const forthYear_firstSem = [
+  " ",
+
   "Essentials of ICT and PC Applications",
   "Fundamentals of Programming",
   "Logic designing and Computer Organization",
@@ -412,6 +444,8 @@ const forthYear_firstSem = [
   "Practical for Database Design",
 ];
 const forthYear_secondSem = [
+  " ",
+
   "Scaling and Connecting Network",
   "Cryptography",
   "Vulnerability Assessment and Penetration Testing-I",

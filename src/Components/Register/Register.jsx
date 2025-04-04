@@ -1,7 +1,7 @@
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { useAppContext } from "../AppContext/AppContext";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import InputField from "../Common/InputField";
 import DropDown from "../Common/DropDown";
@@ -9,8 +9,19 @@ import ProfileImage from "../Common/ProfileImage";
 import UploadImage from "../Common/UploadImage";
 import ErrorComponent from "../Notification/ErrorComponent";
 import Add from "../Notification/Add";
+import { AuthContext } from "../AppContext/AuthContext";
 const Register = ({ lec_code }) => {
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+  const {token} = useContext(AuthContext)
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (token) {
+      navigate("/dashboard");
+    }
+  }, [navigate, token]);
+
   const { accountType } = useAppContext();
   const [error, setError] = useState("");
   const [warning, setWarning] = useState("");
@@ -139,7 +150,7 @@ const Register = ({ lec_code }) => {
       }
     }
     await fetch(
-      `http://localhost:8000/api/${
+      `${API_BASE_URL}${
         registerDetails?.account_type === "Student"
           ? "student_register"
           : "lecturer_register"
@@ -185,7 +196,7 @@ const Register = ({ lec_code }) => {
     );
   };
   return (
-    <div className="w-full sm:w-1/2 m-auto">
+    <div className="w-full sm:w-3/5 m-auto">
       {onSuccess ? success() : null}
       <br></br>
       <form className="">

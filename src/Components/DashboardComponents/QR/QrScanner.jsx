@@ -1,16 +1,23 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { use, useContext, useEffect, useState } from "react";
 import QRCode from "react-qr-code";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import "./qrStyle.css";
 import { AuthContext } from "../../AppContext/AuthContext";
+import { Steps } from "openai/resources/beta/threads/runs/steps.mjs";
+import { useNavigate } from "react-router-dom";
 function QrScanner() {
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+  const Navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [scanResult, setScanResult] = useState("");
   const [id, setId] = useState("");
   const [scandata, setScanData] = useState([]);
   const [notifier, setNotifer] = useState("");
   const [attempt, setAttempt] = useState(0);
-  const [finish, setFinish] = useState();
+  const [currentTime, setCurrentTime] = useState();
+  // const [resetMin,setResetMin] = useState(0)
+  // const [resetSec,setResetSec] = useState(0)
 
   const localSucces = localStorage.getItem("success");
   const todayDate = new Date().toLocaleDateString("en-CA");
@@ -35,7 +42,7 @@ function QrScanner() {
     try {
       const response = await fetch(
         // `http://localhost:8000/api/get_record_history/${todayDate}/${id}`,
-        `http://localhost:8000/api/get_record_history/${todayDate}/${localStorage.getItem(
+        `${API_BASE_URL}get_record_history/${todayDate}/${localStorage.getItem(
           "id"
         )}`,
 
@@ -56,6 +63,8 @@ function QrScanner() {
           if (responseData?.data[0]?.status === "Finished") {
             setFinish(true);
             localStorage.removeItem("success");
+          } else if (responseData?.data[0].status === "Reset") {
+            setReset(true);
           }
         }
       }
@@ -64,23 +73,20 @@ function QrScanner() {
     }
   };
 
-  useEffect(() => {
-    if (!finish) {
-      console.log("Not Finished");
-      const timeInterval = setInterval(() => {
-        fetchRecords();
-      }, 1000);
-      return () => clearInterval(timeInterval);
-    }
-    console.log("Finished");
-
-    
-  }, []);
+  // useEffect(() => {
+  //   const timeInterval = setInterval(() => {
+  //     setResetTime(prev => prev + 1)
+  //   }, 1000);
+  //   return () => clearInterval(timeInterval);
+  // }, []);
 
   useEffect(() => {
     if (scanResult) {
       if (scandata?.qr_code === scanResult) {
         setSuccess(true);
+        localStorage.setItem("success", true);
+        localStorage.setItem("successTime", new Date());
+
         setAttempt(attempt + 1);
         const updatedAttendance = {
           attendance: "true",
@@ -88,7 +94,7 @@ function QrScanner() {
           student_reg_no: user?.registration_no,
           student_name: user?.init_name,
         };
-        fetch("http://localhost:8000/api/mark_attendance", {
+        fetch(`${API_BASE_URL}mark_attendance`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -116,16 +122,31 @@ function QrScanner() {
     }
   }, [id]);
 
-  useEffect(() => {
-    if (!success) {
-      return;
-    }
-    // localstorage use for temporarily
-    localStorage.setItem("success", true);
-  }, [success]);
 
+
+  const successTime = localStorage.getItem("successTime")
+    ? new Date(localStorage.getItem("successTime"))
+    : new Date();
+  const resetTime = successTime ? new Date(successTime.getTime() + 1.5 * 60 * 1000) : null;
+
+  useEffect(() => {
+    if (localSucces) {
+      const interval = setInterval(() => {
+        setCurrentTime(new Date().toLocaleTimeString());
+        if (Math.abs(new Date().getTime() - resetTime.getTime()) < 1000) {
+          localStorage.removeItem("success");
+          localStorage.removeItem("id");
+          localStorage.removeItem("successTime")
+          Navigate("/dashboard");
+          clearInterval(interval);
+        }
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, []);
   const updatedQrCode = async () => {
-    await fetch(`http://localhost:8000/api/qr_get/${id}`, {
+    await fetch(`${API_BASE_URL}qr_get/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -173,6 +194,9 @@ function QrScanner() {
             <p className="text-gray-500 mb-1 font-bold px-auto ">
               Attendance Mark by scanning QR Code
             </p>
+            {localSucces ? (
+              <p>Reset At : {resetTime.toLocaleTimeString()}</p>
+            ) : null}
             {/* Return : <a>{qrCode ? qrCode : "null"}</a> */}
             <div className="w-full flex m-auto justify-center align-middletext-center">
               {scanResult || localSucces ? (
@@ -270,13 +294,13 @@ function QrScanner() {
                 <div className="text-center" id="reader"></div>
               )}
             </div>
-            <div>
+            {/* <div>
               {scanResult
                 ? scanResult
                 : localStorage.getItem("id")
                 ? localStorage.getItem("id")
                 : "NO SCAN RESULT"}
-            </div>
+            </div> */}
             {/* <div>
               {!success || !localSucces ? (
                 <h1>{sessionExpired ? "Session Expired!" : ""}</h1>
