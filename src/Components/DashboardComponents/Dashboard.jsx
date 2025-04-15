@@ -47,7 +47,7 @@ const Dashboard = () => {
             {user?.account_type === "Lecturer" ? (
               <DashboardCards
                 account_type={user?.account_type}
-                disable={true}
+                // disable={true}
                 label={
                   user?.account_type === "Lecturer" ? "Qr Gen" : "Not Available"
                 }

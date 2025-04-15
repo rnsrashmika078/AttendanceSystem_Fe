@@ -11,31 +11,23 @@ export const AuthProvider = ({ children }) => {
   const [sessionData, setSessionData] = useState();
 
   const decrypt = (secretKey, encryptedToken, encryptedUser) => {
-    const bytesToken = CryptoJS.AES.decrypt(encryptedToken, secretKey);
-    const decryptedToken = bytesToken.toString(CryptoJS.enc.Utf8);
+    try {
+      const bytesToken = CryptoJS.AES.decrypt(encryptedToken, secretKey);
+      const decryptedToken = bytesToken.toString(CryptoJS.enc.Utf8);
 
-    const bytesUser = CryptoJS.AES.decrypt(encryptedUser, secretKey);
-    const decryptedUser = JSON.parse(bytesUser.toString(CryptoJS.enc.Utf8));
-    return {
-      token: decryptedToken,
-      user: decryptedUser,
-    };
+      const bytesUser = CryptoJS.AES.decrypt(encryptedUser, secretKey);
+      const decryptedUser = JSON.parse(bytesUser.toString(CryptoJS.enc.Utf8));
+
+      return {
+        token: decryptedToken,
+        user: decryptedUser,
+      };
+    } catch (error) {
+      console.error("Decryption failed", error);
+      return { token: null, user: null };
+    }
   };
-  // const decryptSession = (secretKey, encryptSessionData) => {
-  //   const bytesSessionData = CryptoJS.AES.decrypt(
-  //     encryptSessionData,
-  //     secretKey
-  //   );
-  //   const decryptedString = bytesSessionData.toString(CryptoJS.enc.Utf8);
-  //   if (!decryptedString) {
-  //     return;
-  //   } else {
-  //     try {
-  //       const decryptSessionData = JSON.parse(decryptedString);
-  //       return decryptSessionData;
-  //     } catch (error) {}
-  //   }
-  // };
+
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
@@ -50,17 +42,11 @@ export const AuthProvider = ({ children }) => {
       setToken(newToken);
       setUser(newUser);
     }
-
-    // if (storedSessionData) {
-    //   const newSessionData = decryptSession("abc", storedSessionData);
-    //   setSessionData(newSessionData);
-    // }
   }, []);
 
   useEffect(() => {
     const storedSession = JSON.parse(localStorage.getItem("session"));
 
-    console.log("AUTH RESULT" ,storedSession)
     // const storedSuccessTime = localStorage.getItem("successTime");
 
     if (storedSession) {

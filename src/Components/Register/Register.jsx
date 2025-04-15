@@ -49,6 +49,7 @@ const Register = ({ lec_code }) => {
     account_type: "",
     dp: "",
     init_name: "",
+    username:"",
     email: "",
     password: "",
     confirm: "",
@@ -196,7 +197,7 @@ const Register = ({ lec_code }) => {
     );
   };
   return (
-    <div className="w-full sm:w-3/5 m-auto">
+    <div className="w-full sm:w-3/5 m-auto my-15">
       {onSuccess ? success() : null}
       <br></br>
       <form className="">
@@ -211,7 +212,7 @@ const Register = ({ lec_code }) => {
                 Please Register to Continue to use the Services
               </p>
               {/* First Row */}
-              <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
+              <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 xl:grid-cols-4">
                 <DropDown
                   span={2}
                   htmlFor={"account_type"}
@@ -236,7 +237,7 @@ const Register = ({ lec_code }) => {
               </div>
 
               {/* Second Row */}
-              <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-1">
+              <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-1 ">
                 <UploadImage
                   span={1}
                   label="Display Picture"
@@ -247,7 +248,18 @@ const Register = ({ lec_code }) => {
               </div>
 
               {/* Third Row */}
-              <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3">
+              <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3 xl:grid-cols-4">
+              <InputField
+                  span={2}
+                  htmlFor="Username"
+                  label="Username"
+                  placeholder={"Ex: Mahela Jayawardhana"}
+                  type="text"
+                  name={"username"}
+                  id="username"
+                  value={registerDetails.username}
+                  handleOnChange={handleOnChange}
+                />
                 <InputField
                   span={2}
                   htmlFor="Email"
@@ -286,7 +298,7 @@ const Register = ({ lec_code }) => {
               {/* Fourth Row */}
               {registerDetails.account_type === "Student" ? (
                 <>
-                  <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
+                  <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 ">
                     <InputField
                       span={3}
                       htmlFor="registration_no"
@@ -310,7 +322,7 @@ const Register = ({ lec_code }) => {
                     />
                   </div>
 
-                  <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3">
+                  <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3  xl:grid-cols-4">
                     <DropDown
                       span={2}
                       htmlFor="year"
@@ -349,7 +361,7 @@ const Register = ({ lec_code }) => {
                   </div>
                 </>
               ) : (
-                <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
+                <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2  xl:grid-cols-2">
                   <DropDown
                     span={3}
                     htmlFor="department"

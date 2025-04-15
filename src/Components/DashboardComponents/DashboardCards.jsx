@@ -25,7 +25,7 @@ const DashboardCards = ({
                  bg-blue-500 
                rounded-r-2xl w-1/2 m-1 text-white   data-focus:outline-hidden`}
                 >
-                  {label ? label : null}
+                  {label ? label : "null"}
                 </li>
               </div>
             ) : null

@@ -72,6 +72,10 @@ const Login = () => {
       setError("Please Select the Account Type!");
       return;
     }
+    if (!loginDetails.email.includes("@gmail.com")) {
+      setError("@gmail.com is Required!");
+      return;
+    }
     await fetch(
       `${API_BASE_URL}${
         loginDetails?.account_type === "Student"
@@ -110,7 +114,6 @@ const Login = () => {
         }
       })
       .catch((error) => {
-        alert("Error: " + error.message);
       });
   };
   const success = () => {
@@ -128,102 +131,102 @@ const Login = () => {
   }, [loginDetails]);
   return (
     <>
-      <div className=" w-auto mx-2 ">
+      <div className=" w-auto mx-2 py-15">
         {onSuccess ? success() : null}
         <div className="space-y-0">
           <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-              {/* <img
+              <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+                {/* <img
                 alt="Your Company"
                 src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
                 className="mx-auto h-10 w-auto"
               /> */}
-              <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
-                Welocome Back
-              </h2>
-              <p className="text-center mt-1 text-sm/6 text-gray-600">
-                Login to your account with login Credentials
-              </p>
-            </div>
+                <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+                  Welocome Back
+                </h2>
+                <p className="text-center mt-1 text-sm/6 text-gray-600">
+                  Login to your account with login Credentials
+                </p>
+              </div>
 
-            <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-              <InputField
-                span={2}
-                htmlFor="email"
-                label="Email Address"
-                placeholder={"Ex: abc123@gmail.com"}
-                type="email"
-                name={"email"}
-                id="email"
-                value={loginDetails.email}
-                handleOnChange={handleOnChange}
-              />
-            </div>
+              <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+                <InputField
+                  span={2}
+                  htmlFor="email"
+                  label="Email Address"
+                  placeholder={"Ex: abc123@gmail.com"}
+                  type="email"
+                  name={"email"}
+                  id="email"
+                  value={loginDetails.email}
+                  handleOnChange={handleOnChange}
+                />
+              </div>
 
-            <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-              <InputField
-                span={2}
-                htmlFor="password"
-                label="Password"
-                placeholder={"Ex: abc123"}
-                type="password"
-                name={"password"}
-                id="password"
-                value={loginDetails.password}
-                handleOnChange={handleOnChange}
-              />
-            </div>
-            <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-              <DropDown
-                span={2}
-                htmlFor={"account_type"}
-                label={"Account Type"}
-                autoComplete={"account_type"}
-                id={"account_type"}
-                name={"account_type"}
-                options={["Student", "Lecturer"]}
-                handleOnChange={handleOnChange}
-              />
-            </div>
-            <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-              <a
-                href="#"
-                className="font-semibold text-indigo-600 hover:text-indigo-500"
-              >
-                Forgot password?
-              </a>
-            </div>
-            <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-              <button
-                type="button"
-                onClick={handleLogin}
-                className="flex w-full m-auto justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              >
-                Sign in
-              </button>
-            </div>
-
-            <p className="mt-5 text-center text-sm/6 text-gray-500">
-              Don't have an account ?{" "}
-              <Link to="/register">
+              <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+                <InputField
+                  span={2}
+                  htmlFor="password"
+                  label="Password"
+                  placeholder={"Ex: abc123"}
+                  type="password"
+                  name={"password"}
+                  id="password"
+                  value={loginDetails.password}
+                  handleOnChange={handleOnChange}
+                />
+              </div>
+              <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+                <DropDown
+                  span={2}
+                  htmlFor={"account_type"}
+                  label={"Account Type"}
+                  autoComplete={"account_type"}
+                  id={"account_type"}
+                  name={"account_type"}
+                  options={["Student", "Lecturer"]}
+                  handleOnChange={handleOnChange}
+                />
+              </div>
+              <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
                 <a
                   href="#"
                   className="font-semibold text-indigo-600 hover:text-indigo-500"
                 >
-                  Click here to Register
+                  Forgot password?
                 </a>
-              </Link>
-            </p>
-            <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-              {error ? (
-                <ErrorComponent
-                  message={error}
-                  title={errorMsgTitle || "Missing Field!"}
-                />
-              ) : null}
+              </div>
+              <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+                <button
+                  type="button"
+                  onClick={handleLogin}
+                  className="flex w-full m-auto justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                  Sign in
+                </button>
+              </div>
+
+              <p className="mt-5 text-center text-sm/6 text-gray-500">
+                Don't have an account ?{" "}
+                <Link to="/register">
+                  <a
+                    href="#"
+                    className="font-semibold text-indigo-600 hover:text-indigo-500"
+                  >
+                    Click here to Register
+                  </a>
+                </Link>
+              </p>
+              <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+                {error ? (
+                  <ErrorComponent
+                    message={error}
+                    title={errorMsgTitle || "Missing Field!"}
+                  />
+                ) : null}
+              </div>
             </div>
           </div>
-        </div>
       </div>
     </>
   );

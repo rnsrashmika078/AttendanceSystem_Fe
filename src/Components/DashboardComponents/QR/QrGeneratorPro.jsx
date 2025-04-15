@@ -10,11 +10,12 @@ import { update } from "lodash";
 import { AuthContext } from "../../AppContext/AuthContext";
 import Timer from "./Timer";
 
-function QrGenerator() {
+function QrGeneratorPro() {
   //Content API
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   const { exitFromBrowser } = useContext(AuthContext);
+
   const [currentState, setCurrentState] = useState(false); //To track whether start click or not
   const [code, setCode] = useState("");
   const [initialize, setInitialize] = useState(false);
@@ -31,7 +32,10 @@ function QrGenerator() {
   const [viewAttendance, setViewAttendance] = useState(false);
   // const [qrTime,setQrTime] = useState(5000);
 
-  const handleSetEditTimer = () => {
+  const navigate = useNavigate();
+
+  const handleSetEditTimer = (e) => {
+    const id = e.target;
     if (!editTimer) {
       setEditTimer(true);
     }
@@ -64,28 +68,30 @@ function QrGenerator() {
     };
   }, []);
 
+  // const QrChangeTime = (e) => {
+  //   const { value } = e.target;
+  //   setQrTime(value);
+  // };
   const updatedQrRecordHistory = async (status) => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}create_qr_record/${subCode}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json",
-          },
-          body: JSON.stringify({ sub_code: subCode, status: status }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}create_qr_record/${subCode}`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({ sub_code: subCode, status: status}),
+      });
 
       if (!response.headers) {
         throw new Error("Error while getting response from !");
       }
       const data = await response.json();
       if (data) {
-        console.log(data);
+        console.log(data)
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
+
     }
   };
   const updatedQrCode = async (custom) => {
@@ -134,8 +140,7 @@ function QrGenerator() {
   useEffect(() => {
     if (currentState || start || code) {
       updatedQrCode();
-      // alert(start)
-      console.log("Qr Code Updated!");
+      console.log("Qr Code Updated!")
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentState, start, code]);
@@ -144,8 +149,9 @@ function QrGenerator() {
     if (!finished && minutes === 0 && seconds === 0) {
       setFinished(true);
     }
-    if (finished) {
-      console.log(finished);
+    if(finished){
+      console.log(finished)
+
     }
   }, [minutes, seconds, finished]);
 
@@ -181,34 +187,34 @@ function QrGenerator() {
     setStep(0);
     setReset(true);
     updatedQrCode("reset");
-    updatedQrRecordHistory("Reset");
+    updatedQrRecordHistory("Reset")
     clearTimeout();
   };
-  // 2 reqeuset when click reset
+  // 2 reqeuset when click reset 
 
   const handleOnChange = (e) => {
     const { value } = e.target;
     setCode(value);
   };
 
-  // 2 request when finished
+// 2 request when finished
   useEffect(() => {
     const time = step <= 0 ? 5000 : 30000;
     // const time = 15000;
     if (finished) {
       updatedQrRecordHistory("Finished");
-      console.log("delete");
+      console.log("delete")
       deleteQrCode();
       return;
     }
     if (currentState || start) {
-      const timeout = setInterval(() => {
+      const timeOut = setTimeout(() => {
         const randomCode =
           Math.random().toString(36).substring(2, 10).toUpperCase() + subCode;
         setCode(randomCode);
-        setStep((prev) => prev + 1);
+        setStep((prevStep) => prevStep + 1);
       }, time);
-      return () => clearInterval(timeout);
+      return () => clearTimeout(timeOut);
     }
   }, [finished, reset, currentState, step, subCode, start]);
 
@@ -273,19 +279,7 @@ function QrGenerator() {
             />
           ) : null}
           {initialize ? (
-            <Timer
-              finished={finished}
-              currentState={currentState}
-              start={start}
-              minutes={minutes}
-              seconds={seconds}
-              counter={counter}
-              handleFinish={handleFinish}
-              handleStartTimer={handleStartTimer}
-              handleSetEditTimer={handleSetEditTimer}
-              handleResetTimer={handleResetTimer}
-              displayQRCode={displayQRCode}
-            />
+            <Timer finished={finished} currentState={currentState} start={start}  minutes={minutes} seconds={seconds} counter={counter} handleFinish={handleFinish} handleStartTimer={handleStartTimer} handleSetEditTimer={handleSetEditTimer} handleResetTimer={handleResetTimer} displayQRCode={displayQRCode}/>
           ) : (
             //   Form to setup QR
             <QRForm setInitialize={setInitialize} setSubCode={setSubCode} />
@@ -296,4 +290,4 @@ function QrGenerator() {
   );
 }
 
-export default QrGenerator;
+export default QrGeneratorPro;

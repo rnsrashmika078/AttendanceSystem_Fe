@@ -102,10 +102,10 @@ export default function Card() {
   };
 
   //refresh data
-  useEffect(() => {
-    fetchAllData();
-    CurrentPage();
-  }, [indexDay]);
+  // useEffect(() => {
+  //   fetchAllData();
+  //   CurrentPage();
+  // }, [indexDay]);
 
   return (
     <div className="bg-gray-100 py-5">

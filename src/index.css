@@ -1,1 +1,193 @@
+@import url("https://fonts.googleapis.com/css2?family=Boldonse&display=swap");
+
 @import "tailwindcss";
+
+@theme {
+  --color-mint-500: oklch(0.72 0.11 178);
+  --font-display: "Oswald", "sans-serif";
+  --font-my: "Boldonse", "sans-serif";
+}
+@utility scrollbar-hidden {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.light {
+  --background: 190, 190, 190, 0.15;
+
+  --text: 50, 50, 50, 1;
+  --secondary-text: 50, 50, 50, 0.6;
+
+  --link: 85, 185, 255;
+  --link-hover: 255, 255, 255;
+
+  --input-background: 255, 255, 255, 0.1;
+  --input-border: 80, 80, 80, 0.2;
+  --input-text: 0, 0, 0;
+
+  --card-text-color-1: 0, 150, 250, 1;
+  --card-text-color-2: 0, 0, 0, 1;
+  --card-bg-color: 255, 255, 255, 0.5;
+
+  --bg-color: 255, 255, 255, 1;
+
+  --border-color: 50, 50, 50, 0.1;
+
+  --icon-foreground-color: 50, 50, 50, 0.8;
+  --icon-bg-color: 50, 50, 50, 0.05;
+
+  --dashboard-hover-item-bg-color: 50, 50, 50, 0.1;
+  --dashboard-active-item-bg-color: 50, 50, 50, 0.1;
+
+  --card-text-3-bg-color: 120, 255, 52, 0.13;
+  --card-text-3-color: 53, 152, 23;
+
+  --toggle-bg-color: 50, 50, 50, 0.1;
+}
+.dark {
+  --background: 0, 0, 0, 0.95;
+
+  --text: 255, 255, 255, 0.7;
+  --secondary-text: 200, 200, 250, 1;
+
+  --link: 85, 185, 255;
+  --link-hover: 255, 255, 255;
+
+  --input-background: 50, 50, 50, 0.5;
+  --input-border: 80, 80, 80, 0.5;
+  --input-text: 255, 255, 255;
+
+  --icon-foreground-color: 255, 255, 255, 1;
+  --icon-bg-color: 50, 50, 50, 0.5;
+
+  --border-color: 255, 255, 255, 0.1;
+
+  --bg-color: 20, 20, 20, 1;
+
+  --card-text-color-2: 255, 255, 255, 1;
+  --card-text-color-1: 0, 150, 250, 1;
+  --card-bg-color: 50, 50, 50, 0.3;
+
+  --dashboard-hover-item-bg-color: 50, 50, 50, 1;
+  --dashboard-active-item-bg-color: 50, 50, 50, 1;
+
+  --card-text-3-bg-color: 120, 255, 52, 0.13;
+  --card-text-3-color: 104, 255, 29;
+
+  --toggle-bg-color: 50, 50, 50, 1;
+}
+
+body {
+  background-color: rgb(var(--background));
+  color: rgb(var(--text));
+}
+
+.card {
+  background-color: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
+}
+
+.link {
+  color: rgb(var(--link));
+}
+
+.link:hover {
+  color: rgb(var(--link-hover));
+}
+
+.input {
+  background-color: rgb(var(--input-background));
+  border: 1px solid rgb(var(--input-border));
+  color: rgb(var(--input-text));
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(20deg);
+  }
+  50% {
+    transform: rotate(-20deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+@keyframes slidefromRight {
+  0% {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes slidefromLeft {
+  0% {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes slidefromTop {
+  0% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes scale-up {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(100%);
+    opacity: 1;
+  }
+}
+@keyframes rotation-360 {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.rot-360 {
+  animation: rotation-360 1s infinite;
+}
+.slide-from-right {
+  animation: slidefromRight 0.5s ease-out forwards;
+}
+.slide-from-left {
+  animation: slidefromLeft 0.5s ease-out forwards;
+}
+.slide-from-top {
+  animation: slidefromTop 0.5s ease-out forwards;
+}
+.rotation {
+  animation: rotation 0.5s ease-out forwards;
+}
+.dashboard-slide-from-right {
+  animation: slidefromRight 0.5s ease-out forwards;
+}
+.dashboard-slide-from-left {
+  animation: slidefromLeft 0.5s ease-out forwards;
+}
+.dashboard-slide-from-top {
+  animation: slidefromTop 0.5s ease-out forwards;
+}
+.dashboard-rotation {
+  animation: rotation 0.5s ease-out forwards;
+}
+.dashboard-scale {
+  animation: scale-up 0.5s ease-out;
+}

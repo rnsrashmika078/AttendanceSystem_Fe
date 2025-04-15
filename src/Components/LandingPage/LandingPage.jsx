@@ -1,13 +1,12 @@
 import { useContext } from "react";
-import "./landingpage.css"
+import "./landingpage.css";
 import { AuthContext } from "../AppContext/AuthContext";
 import { useNavigate } from "react-router-dom";
 const LandingPage = () => {
-
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
   const handleLoginClick = () => {
-    navigate('/dashboard')
+    navigate("/dashboard");
   };
   return (
     <>
@@ -17,16 +16,13 @@ const LandingPage = () => {
         <section className="home">
           <div className="focus-content">
             <div className="home-content">
-              <h1>REACT VITE PROJECT</h1> {/*three word long*/}
-              <h3>React Project Using Latest VITE</h3>
+              <h1>UNIVERSITY ATTENDANCE SYSTEM</h1> {/*three word long*/}
+              <h3>Track, Analyze, Attend</h3>
               <p>
-                VITE is the Latest and Full Optimized Alternative to CRA aka
-                Create-react-app
+                Keep attendance records, track and analyze data in real-time.
               </p>
               <button onClick={handleLoginClick} className="btn-lp">
-                {token
-                  ? "GO TO DASHBOARD"
-                  : "REGISTER NOW!"}
+                {token ? "GO TO DASHBOARD" : "GET STARTED!"}
               </button>
             </div>
           </div>
@@ -40,5 +36,5 @@ const LandingPage = () => {
       </div>
     </>
   );
-}
+};
 export default LandingPage;

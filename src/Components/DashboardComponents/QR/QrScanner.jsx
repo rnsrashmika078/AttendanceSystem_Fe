@@ -15,6 +15,7 @@ function QrScanner() {
   const [scandata, setScanData] = useState([]);
   const [notifier, setNotifer] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const [validation, setValidation] = useState("");
   const [currentTime, setCurrentTime] = useState();
   // const [resetMin,setResetMin] = useState(0)
   // const [resetSec,setResetSec] = useState(0)
@@ -84,6 +85,7 @@ function QrScanner() {
     if (scanResult) {
       if (scandata?.qr_code === scanResult) {
         setSuccess(true);
+        setValidation("valid");
         localStorage.setItem("success", true);
         localStorage.setItem("successTime", new Date());
 
@@ -112,6 +114,7 @@ function QrScanner() {
         setAttempt(attempt + 1);
         setSuccess(false);
         setAttendance(null);
+        setValidation("invalid");
       }
     }
   }, [scandata, scanResult, id, user?.registration_no, user?.init_name]);
@@ -122,12 +125,12 @@ function QrScanner() {
     }
   }, [id]);
 
-
-
   const successTime = localStorage.getItem("successTime")
     ? new Date(localStorage.getItem("successTime"))
     : new Date();
-  const resetTime = successTime ? new Date(successTime.getTime() + 1.5 * 60 * 1000) : null;
+  const resetTime = successTime
+    ? new Date(successTime.getTime() + 30 * 60 * 1000)
+    : null;
 
   useEffect(() => {
     if (localSucces) {
@@ -136,7 +139,7 @@ function QrScanner() {
         if (Math.abs(new Date().getTime() - resetTime.getTime()) < 1000) {
           localStorage.removeItem("success");
           localStorage.removeItem("id");
-          localStorage.removeItem("successTime")
+          localStorage.removeItem("successTime");
           Navigate("/dashboard");
           clearInterval(interval);
         }
@@ -146,6 +149,7 @@ function QrScanner() {
     }
   }, []);
   const updatedQrCode = async () => {
+    setValidation("validating");
     await fetch(`${API_BASE_URL}qr_get/${id}`, {
       method: "GET",
       headers: {
@@ -264,7 +268,7 @@ function QrScanner() {
                       </div>
                     </div>
                   </div>
-                ) : (
+                ) : validation === "invalid" ? (
                   // red error -> invalid QR Scan
                   <div>
                     <div>
@@ -289,6 +293,8 @@ function QrScanner() {
                       </div>
                     </div>
                   </div>
+                ) : (
+                  <div>Validating...</div>
                 )
               ) : localSucces ? null : (
                 <div className="text-center" id="reader"></div>
@@ -306,6 +312,19 @@ function QrScanner() {
                 <h1>{sessionExpired ? "Session Expired!" : ""}</h1>
               ) : null}
             </div> */}
+          </div>
+          <div>
+            <h1>{scandata?.qr_code}</h1>
+          </div>
+          <div>
+            <button
+              onClick={() => {
+                localStorage.removeItem("success");
+                localStorage.removeItem("successTime");
+              }}
+            >
+              Start Over
+            </button>
           </div>
         </div>
       </div>
